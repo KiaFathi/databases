@@ -22,6 +22,13 @@ dbConnection.connect();
 //     console.log(err);
 //     console.log(rows);
 //   });
+var insertMessage = function(msg, userID){
+  var queryStr = "insert into messages (message, userID) values('" + msg + "','"+ userID +"');";
+  dbConnection.query(queryStr, function(err, rows){
+    if(err){console.log("Did not insert new string");}
+    else{ console.log("Success");} 
+  });
+};
 
 
 
@@ -70,23 +77,14 @@ module.exports.handler = function(request, response) {
       dbConnection.query(queryStr, function(err, rows){
         if(rows[0]){
           var userID = rows[0].id;
-          var queryStr = "insert into messages (message, userID) values('" + msg + "','"+ userID +"');";
-          console.log(queryStr);
-          dbConnection.query(queryStr, function(err, rows){
-            if(err){console.log("Did not insert new string");}
-            else{ console.log("Success");} 
-          });
+          insertMessage(msg, userID);
         }
         else{
           console.log("Could not find that user_name");
           var queryStr = "insert into users (user_name) values('" + user + "');";
           dbConnection.query(queryStr, function(err, result){
             var userID = (result.insertId);
-            var queryStr = "insert into messages (message, userID) values('" + msg + "','"+ userID +"');";
-            dbConnection.query(queryStr, function(err, rows){
-              if(err){console.log("Did not insert new string");}
-              else{ console.log("Success");} 
-            });
+            insertMessage(msg, userID);
           });
         }
       });
