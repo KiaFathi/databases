@@ -36,20 +36,15 @@ module.exports.handler = function(request, response) {
   /* the 'request' argument comes from nodes http module. It includes info about the
   request - such as what URL the browser is requesting. */
   var method = request.method;
-  console.log("type: " + request.type);
   console.log("method: " + request.method);
   var url = request.url;
-  console.log(url);
   var uri = request.uri;
   var path = url.split('/') || uri.split('/');
-
-  console.log("path[1]: " + path[1]);
-
 
   /* Documentation for both request and response can be found at
    * http://nodemanual.org/0.8.14/nodejs_ref_guide/http.html */
 
-  console.log("Serving request type " + request.method + " for url " + request.url);
+  console.log("Serving request type " + request.method + " for url" + request.url);
 
   /* Without this line, this server wouldn't work. See the note
    * below about CORS. */
@@ -89,7 +84,6 @@ module.exports.handler = function(request, response) {
         }
       });
 
-      responseMsg.results.unshift(parsedData);
       response.writeHead(statusCode, headers);
       response.end(JSON.stringify(parsedData));
     });
@@ -101,11 +95,10 @@ module.exports.handler = function(request, response) {
     console.log("Handling GET request...");
     headers['Content-Type'] = "application/json";
     
-    var queryStr = "SELECT * FROM messages;" 
+    var queryStr = "SELECT * FROM messages JOIN users ON messages.userID = users.id ORDER BY messages.id DESC;" 
     dbConnection.query(queryStr, function(err, rows){
       response.writeHead(statusCode, headers);
-      console.log(rows);
-      response.end(JSON.stringify(responseMsg));
+      response.end(JSON.stringify(rows));
     });
   } 
 
@@ -144,7 +137,3 @@ var defaultCorsHeaders = {
   "access-control-allow-headers": "content-type, accept",
   "access-control-max-age": 10 // Seconds.
 };
-
-var results = [];
-var responseMsg = {};
-responseMsg.results = results;

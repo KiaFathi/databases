@@ -20,23 +20,18 @@ var app = {
         $('.btn-group').append('<a class="btn dropdown-toggle" id="roomtag">'+ roomname +'</a>');
       }
   },
-  addMessage: function(message){
+  addMessage: function(chatObj){
     var newDiv = $('<div class="chatMessages"></div>');
-    if(app._friendList[message.username]){
-      newDiv.addClass('friendList');
-    }
-    newDiv.append("<a href='#' class='username'>" + _.escape(message.username) + "</a>");
-    newDiv.append("<a href='#' id='messageRoom'>" + _.escape(app._selectedRoom) + "</a>");
-    newDiv.append("<p id='messages'>" + _.escape(message.text) + "</p>" + "</div>");
+    newDiv.append("<a href='#' class='username'>" + chatObj.user_name + "</a>");
+    newDiv.append("<a href='#' id='messageRoom'>All</a>");
+    newDiv.append("<p id='messages'>" + chatObj.message + "</p>" + "</div>");
     $('#chats').append(newDiv);
   },
   display: function(data) {
     app.clearMessages();
-    _.each(data.results, function(chatObj) {
-      if(app._selectedRoom === 'all' || chatObj.roomname === app._selectedRoom){
-        app.addMessage(chatObj);
-      }
-      app.addRoom(chatObj.roomname);
+    _.each(data, function(chatObj) {
+      app.addMessage(chatObj);
+      console.log(chatObj);
     });
   },
   init: function() {
@@ -44,7 +39,7 @@ var app = {
       app.fetch();
     }, 5000);
   },
-  server: 'http://127.0.0.1:8080/classes/1',
+  server: 'http://127.0.0.1:8080/classes',
   handleSubmit: function(text, username, room){
     if(room = 'all'){
       room = '';
