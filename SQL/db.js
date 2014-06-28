@@ -65,38 +65,59 @@ module.exports.handler = function(request, response) {
       var user = parsedData.username;
       var room = parsedData.roomname;
 
-      // var queryStr = 'insert into messages (message) values("' + msg + '");' +
-      //   'insert into users (user_name) values("' + user + '");' +
-      //   'insert into rooms (room_name) values("' + room + '")';
-        
-      var queryStr = 'select'+ user + 'from users'
+      var queryStr = "SELECT * FROM users where user_name= '" + user + "'"; 
+      
       dbConnection.query(queryStr, function(err, rows){
-        // if(err)
-        for(var i = 0; i < rows.length; i ++){
-          if(user = rows[i].user_name){
-            dbConnection.query(newQuery, function(err, rows))
-          }
-        };
-        // console.log(msg);
-        // console.log(user);
-        // console.log(room);
+        if(rows[0]){
+          var userID = rows[0].id;
+          var queryStr = "insert into messages (message, userID) values('" + msg + "','"+ userID +"');";
+          console.log(queryStr);
+          dbConnection.query(queryStr, function(err, rows){
+            if(err){console.log("Did not insert new string");}
+            else{ console.log("Success");} 
+          });
+        }
+        else{
+          console.log("Could not find that user_name");
+          var queryStr = "insert into users (user_name) values('" + user + "');";
+          dbConnection.query(queryStr, function(err, result){
+            var userID = (result.insertId);
+            var queryStr = "insert into messages (message, userID) values('" + msg + "','"+ userID +"');";
+            dbConnection.query(queryStr, function(err, rows){
+              if(err){console.log("Did not insert new string");}
+              else{ console.log("Success");} 
+            });
+          });
+        }
       });
 
       responseMsg.results.unshift(parsedData);
       response.writeHead(statusCode, headers);
       response.end(JSON.stringify(parsedData));
     });
-  } else if (request.method === "GET" && path[1] === 'classes') {
+
+  } 
+
+  else if (request.method === "GET" && path[1] === 'classes') {
     var statusCode = 200;
     console.log("Handling GET request...");
     headers['Content-Type'] = "application/json";
-    response.writeHead(statusCode, headers);
-    response.end(JSON.stringify(responseMsg));
-  } else if (request.method === "OPTIONS") {
+    
+    var queryStr = "SELECT * FROM messages;" 
+    dbConnection.query(queryStr, function(err, rows){
+      response.writeHead(statusCode, headers);
+      console.log(rows);
+      response.end(JSON.stringify(responseMsg));
+    });
+  } 
+
+  else if (request.method === "OPTIONS") {
     var statusCode = 200;
     response.writeHead(statusCode, headers);
     response.end();
-  } else {
+  } 
+
+  else {
     var statusCode = 404;
     headers['Content-Type'] = "text/plain";
     response.writeHead(statusCode, headers);

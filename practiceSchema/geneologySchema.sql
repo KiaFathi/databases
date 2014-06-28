@@ -1,0 +1,5 @@
+--Sequel self joining one table! With inner joins to mothers and fathers
+--Can't really make this in sqldesigner web app
+--Could also make with one foreign table that held names to ids
+  --Links to mothers and father
+  --This is redundant though!
